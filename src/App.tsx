@@ -1,10 +1,11 @@
 import './App.css';
+import Threads from './components/threads/Threads'
 
 function App() {
   return (
-  <>
-  <p>hello</p>
-  </>
+    <>
+      <Threads />
+    </>
   );
 }
 
