@@ -8,39 +8,54 @@ import { BrowserRouter } from "react-router-dom";
 
 describe('threadList', () => {
 
-    const dataThreadMock = () =>
-    new Promise((resolve) => {
-        resolve({
-            ok: true,
-            status: 200,
-            json: async () => [{ id: '1', title: 'testTodo' }, {id: '2', title: 'hello'}]
-        })
-    })
-
     interface Thread {
         id: string;
         title: string;
     }
 
-    const threads: Thread[] = [];
-    //const setThreads: Dispatch<SetStateAction<Thread[]>> = jest.fn();
+    const dataThreadMock: Thread[] = [
+        { id: '1', title: 'testTodo' },
+         {id: '2', title: 'hello'}
+    ];
 
 
     it('should render threads', async () => {
 
-        global.fetch = jest.fn().mockImplementation(dataThreadMock);
-        const mockSetThreads = jest.fn().mockImplementation((newThreads) => {
-            threads.push(...newThreads);
-        });
+        // APIのモック
+        global.fetch = jest.fn(() =>
+            Promise.resolve({
+                // 返すデータをオブジェクトに包む
+                json: () => Promise.resolve({threads: dataThreadMock}),
+            } as Response),
+            );
 
+        const setThreads = jest.fn();
+        
+        // threadsが空の状態を再現
         render(
             <BrowserRouter>
-                <Threads threads={threads} setThreads={mockSetThreads} />
+                <Threads threads={[]} setThreads={setThreads} />
             </BrowserRouter>
         );
-        await waitFor(() => expect(mockSetThreads).toHaveBeenCalled());
+
+        // setTHreadsが呼ばれるまで待つ
+        await waitFor(() => expect(setThreads).toHaveBeenCalled());
+
+        // setThreadsが呼ばれた時の引数を確認
+        expect(setThreads).toHaveBeenCalledWith({ threads: dataThreadMock });
+
+        // threadsにデータがセットされた後の状態を再現
+        render(
+            <BrowserRouter>
+                <Threads threads={dataThreadMock} setThreads={setThreads} />
+            </BrowserRouter>
+        );
+        
+        
         const textElement = await screen.findByText(/testTodo/i);
+        screen.debug(textElement);
         expect(textElement).toBeInTheDocument();
+
     });
 
 /*
