@@ -3,7 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import Threads from "../threads/Threads"
 import { Create } from "../create/Create";
 import userEvent from "@testing-library/user-event";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 
 describe('threadList', () => {
@@ -15,12 +15,11 @@ describe('threadList', () => {
 
     const dataThreadMock: Thread[] = [
         { id: '1', title: 'testTodo' },
-         {id: '2', title: 'hello'}
+        {id: '2', title: 'hello'}
     ];
 
 
     it('should render threads', async () => {
-
         // APIのモック
         global.fetch = jest.fn(() =>
             Promise.resolve({
@@ -38,7 +37,7 @@ describe('threadList', () => {
             </BrowserRouter>
         );
 
-        // setTHreadsが呼ばれるまで待つ
+        // setThreadsが呼ばれるまで待つ
         await waitFor(() => expect(setThreads).toHaveBeenCalled());
 
         // setThreadsが呼ばれた時の引数を確認
@@ -51,47 +50,78 @@ describe('threadList', () => {
             </BrowserRouter>
         );
         
-        
-        const textElement = await screen.findByText(/testTodo/i);
+        const textElement = await screen.findByText(/hello/i);
         screen.debug(textElement);
         expect(textElement).toBeInTheDocument();
-
     });
 
-/*
+
+
     it('should be a button for create new thread', () => {
+        const setThreads = jest.fn();
         render(
             <BrowserRouter>
-                <Threads threads={threads} setThreads={setThreads} />
+                <Threads threads={dataThreadMock} setThreads={setThreads} />
             </BrowserRouter>
         );
-        const buttonElement = screen.getByRole('button', { name:'Create' });
+        const buttonElement = screen.getByRole('link', { name:'Create New Thread' });
         screen.debug(buttonElement);
         expect(buttonElement).toBeInTheDocument();
     });
 
 
     it('navigate from root to thread creation page', async () => {
+        const setThreads = jest.fn();
+
         render(
             <BrowserRouter>
-                <Threads threads={threads} setThreads={setThreads} />
+                <Routes>
+                    <Route index element={<Threads threads={dataThreadMock} setThreads={setThreads} />} />
+                    <Route path="create" element={<Create threads={dataThreadMock} setThreads={setThreads} />} />
+                </Routes>
             </BrowserRouter>
         );
-        await userEvent.click(screen.getByRole("link", { name: "Create New" }));
-        expect(screen.getByText(/create new thread/i)).toBeInTheDocument();
+
+        // トップページからスレッド作成ページに遷移
+        await userEvent.click(screen.getByRole("link", { name: "Create New Thread" }));
+        screen.debug();
+        expect(screen.getByPlaceholderText(/Thread Title/i)).toBeInTheDocument();
+
+        // リセットするためにトップのページに戻る
+        await userEvent.click(screen.getByRole("link", { name: "Back" }));
+        expect(screen.getByText(/hello/i)).toBeInTheDocument();
     });
 
 
     it('should be new thread after create a thread', async () => {
+        let threads = dataThreadMock;
+        const setThreads = (newThreads: Threads[]) => {
+            threads = newThreads;
+        };
         render(
             <BrowserRouter>
-                <Create threads={threads} setThreads={setThreads} />
+                <Routes>
+                    <Route index element={<Threads threads={threads} setThreads={setThreads} />} />
+                    <Route path="create" element={<Create threads={threads} setThreads={setThreads} />} />
+                </Routes>
             </BrowserRouter>
         );
-        const inputElement = screen.getByPlaceholderText(/create new thread/i);
-        await userEvent.type(inputElement, 'new thread created!!{enter}');
+
+        // トップページからスレッド作成ページに遷移
+        await userEvent.click(screen.getByRole("link", { name: "Create New Thread" }));
         screen.debug();
-        await expect(screen.getByText(/new thread created!!/i)).toBeInTheDocument();
+
+        // スレッド作成ページでスレッドを作成
+        const inputElement = screen.getByPlaceholderText(/Thread Title/i);
+        await userEvent.type(inputElement, 'new thread created!!');
+
+        // スレッド作成ページで作成ボタンを押す
+        const submitButtonElement = screen.getByRole('button', { name: 'Create' });
+        await userEvent.click(submitButtonElement);
+
+        screen.debug();
+        await waitFor(() => {
+            expect(screen.getByText(/new thread created!!/i)).toBeInTheDocument();
+        });
     });
-     */
 })
