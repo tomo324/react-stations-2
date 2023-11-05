@@ -21,7 +21,6 @@ export const Threads: React.FC<ThreadsProps> = ({ threads, setThreads }) => {
         if (threads.length === 0) {
             fetch('https://railway.bulletinboard.techtrain.dev/threads')
             .then((res) => res.json())
-            .catch((e) => e)
             .then((data) => setThreads(data))
             .catch((e) => setError(e))
         }

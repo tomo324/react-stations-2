@@ -51,7 +51,6 @@ describe('threadList', () => {
         );
         
         const textElement = await screen.findByText(/hello/i);
-        screen.debug(textElement);
         expect(textElement).toBeInTheDocument();
     });
 
@@ -65,7 +64,6 @@ describe('threadList', () => {
             </BrowserRouter>
         );
         const buttonElement = screen.getByRole('link', { name:'Create New Thread' });
-        screen.debug(buttonElement);
         expect(buttonElement).toBeInTheDocument();
     });
 
@@ -84,7 +82,6 @@ describe('threadList', () => {
 
         // トップページからスレッド作成ページに遷移
         await userEvent.click(screen.getByRole("link", { name: "Create New Thread" }));
-        screen.debug();
         expect(screen.getByPlaceholderText(/Thread Title/i)).toBeInTheDocument();
 
         // リセットするためにトップのページに戻る
@@ -93,10 +90,14 @@ describe('threadList', () => {
     });
 
 
-    it('should be new thread after create a thread', async () => {
+    it('should be a new thread after create a thread', async () => {
         let threads = dataThreadMock;
-        const setThreads = (newThreads: Threads[]) => {
-            threads = newThreads;
+        const setThreads = (newThreads: Thread[] | ((prevThreads: Thread[]) => Thread[])) => {
+            if (typeof newThreads === 'function') {
+                threads = newThreads(threads);
+            } else {
+                threads = newThreads;
+            }
         };
         render(
             <BrowserRouter>
@@ -109,7 +110,6 @@ describe('threadList', () => {
 
         // トップページからスレッド作成ページに遷移
         await userEvent.click(screen.getByRole("link", { name: "Create New Thread" }));
-        screen.debug();
 
         // スレッド作成ページでスレッドを作成
         const inputElement = screen.getByPlaceholderText(/Thread Title/i);
@@ -119,9 +119,42 @@ describe('threadList', () => {
         const submitButtonElement = screen.getByRole('button', { name: 'Create' });
         await userEvent.click(submitButtonElement);
 
-        screen.debug();
         await waitFor(() => {
             expect(screen.getByText(/new thread created!!/i)).toBeInTheDocument();
         });
     });
-})
+
+
+    it('if a new thread is created, it should be in the thread list', async () => {
+        let threads = dataThreadMock;
+        const setThrads: React.Dispatch<React.SetStateAction<Thread[]>> = (newThreads) => {
+            threads = newThreads instanceof Function ? newThreads(threads) : newThreads;
+        };
+
+        // スレッド作成ページをレンダリング
+        render(
+            <BrowserRouter>
+                <Create threads={threads} setThreads={setThrads} />
+            </BrowserRouter>
+            );
+
+        // スレッド作成ページでスレッドを作成
+        const inputElement = await screen.findByPlaceholderText(/Thread Title/i);
+        await userEvent.type(inputElement, 'new thread created!!');
+
+        // スレッド作成ページで作成ボタンを押す
+        const submitButtonElement = screen.getByRole('button', { name: 'Create' });
+        await userEvent.click(submitButtonElement);
+
+        // トップページをレンダリング
+        render(
+            <BrowserRouter>
+                <Threads threads={threads} setThreads={setThrads} />
+            </BrowserRouter>
+            );
+
+        // トップページに新しいスレッドがあることを確認
+        expect(screen.getByText(/new thread created!!/i)).toBeInTheDocument();
+    });
+
+});
