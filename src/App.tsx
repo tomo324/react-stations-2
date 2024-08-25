@@ -1,7 +1,7 @@
 import "./App.css";
 import React, { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { CreateThread } from "./components/threads/create/Create";
+import { CreateThread } from "./components/threads/create/CreateThread";
 import { NotFound } from "./components/NotFound";
 import Threads from "./components/threads/Threads";
 

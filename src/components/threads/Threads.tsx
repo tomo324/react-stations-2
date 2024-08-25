@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import "./Threads.css";
 
 interface Thread {
   id: string;
@@ -24,13 +25,18 @@ export const Threads: React.FC<ThreadsProps> = ({ threads, setThreads }) => {
   }, [threads, setThreads]);
 
   return error ? (
-    <p>Unable to fetch data</p>
+    <p className="error">Unable to fetch data</p>
   ) : (
     <>
-      <Link to="threads/new">Create New Thread</Link>
-      <ul>
+      <h3>Threads</h3>
+      <Link to="threads/new" className="link">
+        Create New Thread
+      </Link>
+      <ul className="thread-list">
         {threads.map((thread) => (
-          <li key={thread.id}>{thread.title}</li>
+          <li key={thread.id} className="thread-item">
+            {thread.title}
+          </li>
         ))}
       </ul>
     </>

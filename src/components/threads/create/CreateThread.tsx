@@ -1,5 +1,6 @@
 import React, { FormEvent, useState, useId, ChangeEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import "./CreateThread.css";
 
 interface Thread {
   id: string;
@@ -30,7 +31,7 @@ export const CreateThread: React.FC<CreateProps> = ({ setThreads }) => {
   };
 
   return (
-    <>
+    <div className="container">
       <h3>Creation Page</h3>
       <form onSubmit={handleSubmit}>
         <label htmlFor="add-thread">New Thread:</label>
@@ -44,7 +45,7 @@ export const CreateThread: React.FC<CreateProps> = ({ setThreads }) => {
         <button type="submit">Create</button>
       </form>
 
-      <Link to="/">Back to top</Link>
-    </>
+      <Link to="/" className="link">Back to top</Link>
+    </div>
   );
 };

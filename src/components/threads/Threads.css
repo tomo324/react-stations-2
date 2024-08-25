@@ -1,0 +1,32 @@
+.link {
+  color: blue;
+  text-decoration: none;
+  margin-bottom: 10px;
+  display: inline-block;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.error {
+  color: red;
+}
+
+.thread-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.thread-item {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 5px 10px;
+  transition: background-color 0.3s;
+}
+
+.thread-item:hover {
+  background-color: #f1f1f1;
+}
