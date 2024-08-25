@@ -32,7 +32,7 @@ export const CreateThread: React.FC<CreateProps> = ({ setThreads }) => {
 
   return (
     <div className="container">
-      <h3>Creation Page</h3>
+      <h3>Create New Thread</h3>
       <form onSubmit={handleSubmit}>
         <label htmlFor="add-thread">New Thread:</label>
         <input
