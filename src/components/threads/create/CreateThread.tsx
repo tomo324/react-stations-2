@@ -45,7 +45,9 @@ export const CreateThread: React.FC<CreateProps> = ({ setThreads }) => {
         <button type="submit">Create</button>
       </form>
 
-      <Link to="/" className="link">Back to top</Link>
+      <Link to="/" className="link">
+        Back to top
+      </Link>
     </div>
   );
 };
