@@ -1,0 +1,21 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  text-align: center;
+  background-color: #f9f9f9;
+}
+
+h1 {
+  font-size: 6rem;
+  color: #ff6b6b;
+  margin: 0;
+}
+
+h3 {
+  font-size: 1.5rem;
+  color: #555;
+  margin: 10px 0;
+}
